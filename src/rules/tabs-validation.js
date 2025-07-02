@@ -97,41 +97,39 @@ function validateTabsBlock(table) {
   for (let i = 2; i < table.getNumRows(); i++) {
     const row = table.getRow(i);
     for (let j = 0; j < row.getNumCells(); j++) {
-      panelHeadings.push(...findHeadings(row.getCell(j)));
+      panelHeadings.push.apply(panelHeadings, findHeadings(row.getCell(j)));
     }
   }
 
   const panelHeadingIds = new Set(panelHeadings.map(h => slugify(h.getText())));
   const tabLinks = [];
-  for (let i = 0; i < tabControlText.getText().length; i++) {
-    const url = tabControlText.getLinkUrl(i);
-    if (url) {
-      // Find the full text of the link
-      let start = i;
-      while (start > 0 && tabControlText.getLinkUrl(start - 1) === url) {
-        start--;
+  if (tabControlText && typeof tabControlText.getLinkUrl === 'function') {
+    for (let i = 0; i < tabControlText.getText().length; i++) {
+      const url = tabControlText.getLinkUrl(i);
+      if (url) {
+        // Find the full text of the link
+        let start = i;
+        let end = i;
+        while (tabControlText.getLinkUrl(start - 1) === url) {
+          start--;
+        }
+        while (tabControlText.getLinkUrl(end + 1) === url) {
+          end++;
+        }
+        const text = tabControlText.getText().substring(start, end + 1);
+        tabLinks.push({ url, text });
+        i = end; // Skip to the end of this link
       }
-      let end = i;
-      while (end < tabControlText.getText().length - 1 && tabControlText.getLinkUrl(end + 1) === url) {
-        end++;
-      }
-      const text = tabControlText.getText().substring(start, end + 1);
-      tabLinks.push({ url, text });
-      i = end; // Move past this link
     }
   }
 
-  tabLinks.forEach((link) => {
-    const anchor = (link.url || '').startsWith('#') ? link.url.substring(1) : null;
-    if (!anchor) {
+  const uniqueLinks = Array.from(new Set(tabLinks.map(l => l.url)));
+
+  uniqueLinks.forEach((linkUrl) => {
+    if (!panelHeadingIds.has(linkUrl.substring(1))) {
       results.push({
         status: 'Error',
-        message: `The tab control "${link.text}" does not link to a valid anchor (e.g., #some-id).`,
-      });
-    } else if (!panelHeadingIds.has(anchor)) {
-      results.push({
-        status: 'Error',
-        message: `The tab control "${link.text}" links to an anchor "#${anchor}" that does not match any heading inside the tab panels.`,
+        message: `The tab control "${tabLinks.find(l => l.url === linkUrl).text}" links to an anchor "#${linkUrl.substring(1)}" that does not match any heading inside the tab panels.`,
       });
     }
   });
