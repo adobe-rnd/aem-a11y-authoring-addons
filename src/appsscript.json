@@ -1,0 +1,32 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/documents.readonly",
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/documents.currentonly"
+  ],
+  "addOns": {
+    "common": {
+      "name": "AEM Accessibility Checker",
+      "logoUrl": "https://static.vecteezy.com/system/resources/previews/010/157/351/original/accessibility-icon-for-web-and-apps-png.png",
+      "layoutProperties": {
+        "primaryColor": "#4285F4",
+        "secondaryColor": "#34A853"
+      }
+    },
+    "docs": {
+      "homepageTrigger": {
+        "runFunction": "onHomepage"
+      },
+      "onFileScopeGrantedTrigger": {
+        "runFunction": "onFileScopeGranted"
+      }
+    }
+  }
+}
