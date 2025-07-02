@@ -3,72 +3,72 @@
  */
 
 /**
- * Finds all image elements within a given parent element.
- * @param {GoogleAppsScript.Document.Element} parentElement The element to search.
+ * Recursively finds all image elements within a given parent element.
+ * @param {GoogleAppsScript.Document.Element} element The element to search.
  * @return {GoogleAppsScript.Document.InlineImage[]} An array of image elements.
  */
-function findImages(parentElement) {
-  const images = [];
-  if (!parentElement || typeof parentElement.getNumChildren !== 'function') {
+function findImages(element) {
+  let images = [];
+  if (!element) {
     return images;
   }
-  for (let i = 0; i < parentElement.getNumChildren(); i++) {
-    const child = parentElement.getChild(i);
-    if (child.getType() === DocumentApp.ElementType.PARAGRAPH) {
-      const paragraph = child.asParagraph();
-      for (let j = 0; j < paragraph.getNumChildren(); j++) {
-        const grandChild = paragraph.getChild(j);
-        if (grandChild.getType() === DocumentApp.ElementType.INLINE_IMAGE) {
-          images.push(grandChild.asInlineImage());
-        }
-      }
-    } else if (child.getType() === DocumentApp.ElementType.TABLE) {
-      // Recursively check inside table cells
-      const table = child.asTable();
-      for (let r = 0; r < table.getNumRows(); r++) {
-        for (let c = 0; c < table.getRow(r).getNumCells(); c++) {
-          images.push(...findImages(table.getCell(r, c)));
-        }
-      }
+
+  // If the element is an image, add it to the list.
+  if (element.getType && element.getType() === DocumentApp.ElementType.INLINE_IMAGE) {
+    images.push(element.asInlineImage());
+  }
+
+  // If the element is a container, recursively search its children.
+  if (typeof element.getNumChildren === 'function') {
+    for (let i = 0; i < element.getNumChildren(); i++) {
+      images = images.concat(findImages(element.getChild(i)));
     }
   }
+
   return images;
 }
 
 /**
  * The main function for the image alt text validation rule.
- * It checks every image in the document to ensure it has alt text.
- * @param {GoogleAppsScript.Document.Document} doc The active Google Document.
- * @return {Object[]} A list of validation results.
+ * It finds all images in the document and checks for alt text.
+ * @param {GoogleAppsScript.Document.Document} doc The Google Document to check.
+ * @return {Object[]} An array of result objects.
  */
 export function checkImageAltText(doc) {
   const results = [];
-  const allImages = findImages(doc.getBody());
+  const body = doc.getBody();
+  let allImages = [];
+
+  // findImages expects an element, so we iterate through the body's children.
+  for (let i = 0; i < body.getNumChildren(); i++) {
+    allImages = allImages.concat(findImages(body.getChild(i)));
+  }
 
   if (allImages.length === 0) {
-    return []; // No images, no issues from this rule.
+    return [];
   }
 
   allImages.forEach((image, index) => {
     const altText = image.getAltDescription();
-    // An alt text of "" is the standard for decorative images.
-    // We flag null, undefined, or strings containing only whitespace.
-    if (altText === null || altText === undefined || altText.trim() === '') {
-      // Only check for empty string if it's not explicitly decorative
-      if (altText !== '""') {
-        results.push({
-          status: 'Warning',
-          message: `Image ${index + 1} appears to be missing a meaningful description. For decorative images, please set the alt text to "".`,
-        });
-      }
+    const imagePosition = index + 1;
+
+    if (!altText) {
+      results.push({
+        status: 'Error',
+        message: `Image ${imagePosition} is missing alternative text. For decorative images, please set the alt text to "".`,
+        element: image,
+      });
+    } else if (altText.trim() === '') {
+      results.push({
+        status: 'Warning',
+        message: `Image ${imagePosition} appears to be missing a meaningful description. For decorative images, please set the alt text to "".`,
+        element: image,
+      });
     }
   });
 
   if (results.length === 0) {
-    results.push({
-      status: 'Success',
-      message: 'All images have alternative text.',
-    });
+    return [{ status: 'Success', message: 'All images have alternative text.' }];
   }
 
   return results;

@@ -66,19 +66,33 @@ function isTabsBlock(table) {
 /**
  * Validates the links within a single "Tabs" block table.
  * @param {GoogleAppsScript.Document.Table} table The "Tabs" block table.
- * @return {Object[]} An array of result objects.
+ * @return {Object[]} An array of result objects for this block.
  */
 function validateTabsBlock(table) {
   const results = [];
-  if (table.getNumRows() < 2) {
+  const tabControlsRow = table.getRow(1);
+  const tabContentRows = table.getNumRows() > 2;
+
+  // 1. Check if the tab controls row has any links
+  const tabControlText = tabControlsRow.getCell(0).getChild(0).asText();
+  let hasLinks = false;
+  if (tabControlText && typeof tabControlText.getLinkUrl === 'function') {
+    for (let i = 0; i < tabControlText.getText().length; i++) {
+      if (tabControlText.getLinkUrl(i)) {
+        hasLinks = true;
+        break;
+      }
+    }
+  }
+
+  if (!hasLinks) {
     results.push({
-      status: 'Error',
-      message: 'A "Tabs" block was found with no second row for tab controls.',
+      status: 'Warning',
+      message: 'A "Tabs" block was found, but the second row contains no links to act as tab controls.',
     });
     return results;
   }
 
-  const tabControlsRow = table.getRow(1);
   const panelHeadings = [];
   for (let i = 2; i < table.getNumRows(); i++) {
     const row = table.getRow(i);
@@ -89,7 +103,6 @@ function validateTabsBlock(table) {
 
   const panelHeadingIds = new Set(panelHeadings.map(h => slugify(h.getText())));
   const tabLinks = [];
-  const tabControlText = tabControlsRow.getCell(0).getChild(0).asText();
   for (let i = 0; i < tabControlText.getText().length; i++) {
     const url = tabControlText.getLinkUrl(i);
     if (url) {
@@ -106,14 +119,6 @@ function validateTabsBlock(table) {
       tabLinks.push({ url, text });
       i = end; // Move past this link
     }
-  }
-
-  if (tabLinks.length === 0) {
-    results.push({
-      status: 'Warning',
-      message: 'A "Tabs" block was found, but the second row contains no links to act as tab controls.',
-    });
-    return results;
   }
 
   tabLinks.forEach((link) => {

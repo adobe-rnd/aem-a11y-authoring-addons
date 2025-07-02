@@ -8,7 +8,4 @@ module.exports = {
 
   // The test environment that will be used for testing
   testEnvironment: "node",
-
-  // setup file to mock globals
-  setupFiles: ['./test/setup-jest.js'],
 }; 
