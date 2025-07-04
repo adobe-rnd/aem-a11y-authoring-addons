@@ -1,0 +1,38 @@
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT License. -->
+<!-- This file shows how to design a first-run page that provides a welcome screen to the user about the features of the add-in. -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AEM Accessibility Checker</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <!-- For more information on Fluent UI, visit https://developer.microsoft.com/fluentui. -->
+    <link rel="stylesheet" href="https://res-1.cdn.office.net/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
+
+    <!-- Template styles -->
+    <link href="taskpane.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="ms-font-m ms-welcome ms-Fabric">
+    <main id="app-body" class="ms-welcome__main">
+        <div class="app-header">
+            <img src="https://icons.iconarchive.com/icons/alecive/flatwoken/128/Apps-Accessibility-icon.png" width="32" height="32"/>
+            &nbsp;
+            <h2 class="ms-font-xl">AEM Accessibility Checker</h2>
+        </div>
+        <p class="ms-font-l">Click the button to check the accessibility of your document.</p>
+        <button id="run" class="ms-Button ms-Button--primary">
+            <span class="ms-Button-label">Run Checks</span>
+        </button>
+        <div id="run-message"></div>
+    </main>
+</body>
+
+</html>

@@ -1,33 +1,21 @@
-# AEM Accessibility Checker for Google Docs
+# AEM Accessibility Checker for Google Docs and Microsoft Word
 
-A Google Docs add-on to check for common accessibility issues before content is published to AEM (Adobe Experience Manager). This tool helps authors identify and fix problems directly in their editing environment, ensuring a more accessible and compliant final product.
+This repository contains a suite of accessibility checkers designed to help content authors find and fix common accessibility issues directly within their authoring environments—Google Docs and Microsoft Word—before publishing content to Adobe Experience Manager (AEM).
 
-## Features
+By integrating accessibility checks into the editing workflow, this project aims to improve content compliance and ensure a better experience for all users.
 
-This add-on currently checks for the following accessibility rules:
+## Packages
 
--   **Image Alt Text**: Verifies that all images have alternative text.
-    -   `Error`: Triggered if an image is missing the alt text description entirely.
-    -   `Warning`: Triggered if the alt text contains only whitespace, as this is often a placeholder and not a meaningful description.
--   **Tabs Component Validation**: Checks the structure of the AEM "Tabs" block component.
-    -   Verifies that the second row of the block contains valid links that point to corresponding anchor headings within the document.
-    -   Flags broken anchor links.
-    -   Warns if no links are found in the tab controls row.
+This project is a monorepo containing two separate packages:
 
-## Deployment
+-   [`packages/gdoc-addon`](./packages/gdoc-addon/README.md): A Google Docs add-on for checking accessibility within Google Docs.
+-   [`packages/word-addin`](./packages/word-addin/README.md): A Microsoft Word add-in that provides an accessibility checking taskpane.
 
-This project uses the [Google Apps Script Command Line Interface (clasp)](https://github.com/google/clasp) for managing deployments.
+Please refer to the `README.md` file within each package for detailed instructions on setup, development, and deployment.
 
-### Prerequisites
+## Quick Start
 
-1.  **Node.js and npm**: Ensure you have Node.js and npm installed. You can download them from [nodejs.org](https://nodejs.org/).
-2.  **Enable the Google Apps Script API**:
-    -   Go to the [Google Apps Script API page](https://script.google.com/home/usersettings).
-    -   Enable the "Google Apps Script API".
-
-### Step 1: Installation
-
-Clone the repository and install the required npm packages.
+To get started, clone the repository and install all dependencies from the root directory.
 
 ```bash
 git clone https://github.com/adobe-rnd/aem-a11y-gdoc-addon.git
@@ -35,40 +23,4 @@ cd aem-a11y-gdoc-addon
 npm install
 ```
 
-### Step 2: Log in to Clasp
-
-Authorize `clasp` to manage your Google Scripts projects. This will open a browser window for you to log in to your Google account.
-
-```bash
-npm run login
-```
-
-### Step 3: Create a New Project
-
-1.  Open a new Google Doc that you will use for testing.
-2.  In the menu, go to `Extensions > Apps Script`. This will create a new, empty Apps Script project bound to your document.
-3.  In the Apps Script editor, go to `Project Settings` (the gear icon on the left).
-4.  Copy the **Script ID**.
-5.  Create a `.clasp.json` file in the root of your local project directory and add the copied Script ID:
-
-    ```json
-    {
-      "scriptId": "YOUR_SCRIPT_ID_HERE"
-    }
-    ```
-
-### Step 4: Build and Deploy
-
-Run the deploy command. This will build the project using webpack and push all the local files to your Apps Script project on Google's servers.
-
-```bash
-npm run deploy
-```
-
-The `--force` flag in the script overwrites all files in the Apps Script project with your local versions.
-
-## Usage
-
-After deploying the script, refresh your Google Doc. You should now see a new menu item: **Accessibility Checker > Run Checks**.
-
-Clicking "Run Checks" will open a sidebar and display a list of any accessibility issues found in the document.
+After installation, follow the specific instructions in the README file for the package you wish to work on.
