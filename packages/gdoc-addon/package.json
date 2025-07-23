@@ -39,5 +39,10 @@
     "web-streams-polyfill": "^4.1.0",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@googleworkspace/google-docs-hast": "^1.0.0",
+    "hast-util-to-html": "^9.0.1",
+    "linkedom": "^0.16.11"
   }
 } 
